@@ -4,7 +4,7 @@
 
 ## Description
 
-Redux DAG allows you to model and enforce dependencies between different values of your state, such that updating one of those values automatically updates all other values which depend on it.
+Redux DAG allows you to model and enforce dependencies between different values of your Redux state, such that updating one of those values automatically updates all other values which depend on it.
 
 Each value is stored in a node. Nodes can depend on other nodes' values, thus forming a dependency graph, which by construction is a DAG. Each node must specify an update function which takes as input the values of the nodes it depends upon, and returns a value, which becomes that node's value. The use of an arbitrary update function allows for modelling complex relationships.
 
