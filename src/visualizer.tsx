@@ -58,8 +58,8 @@ function DagNodeView({ id }: DagNodeViewProps) {
             <p>
                 <span>Id: {node.id}</span>
 	| <span>value: {value}</span>
-	| <span>desc : ({node.desc.join(' ; ')})</span>
 	| <span>deps : ({node.deps.join(' ; ')})</span>
+	| <span>desc : ({node.desc.join(' ; ')})</span>
             </p>
         </div>
     );
