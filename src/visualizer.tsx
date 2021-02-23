@@ -92,7 +92,7 @@ function AddNodeInput() {
             <TextInput id="addNode-id" label="Node id:" ref={idRef} />
             <TextInput id="addNode-value" label="Node value:" ref={valueRef} />
             <TextInput id="addNode-dep" label="Dependencies (space separated):" ref={depsRef} />
-            <input type="button" value="Add!" id="addNode-submit" onClick={() => {
+            <input type="button" value="Add" id="addNode-submit" onClick={() => {
                 const id = idRef.current?.value;
                 const value = valueRef.current?.value;
                 const deps = depsRef.current?.value
@@ -135,7 +135,7 @@ function DeleteNodeInput() {
         <div>
             <h3>Delete node:</h3>
             <TextInput id="deleteNode-id" label="Node id:" ref={idRef} />
-            <input type="button" value="Delete!" id="deleteNode-submit" onClick={() => {
+            <input type="button" value="Delete" id="deleteNode-submit" onClick={() => {
                 const id = idRef.current?.value;
                 if (id) {
                     try {
@@ -165,7 +165,7 @@ function UpdateNodeInput() {
             <h3>Update node:</h3>
             <TextInput id="updateNode-id" label="Node id:" ref={idRef} />
             <TextInput id="updateNode-value" label="Node value:" ref={valueRef} />
-            <input type="button" value="Update!" id="updateNode-submit" onClick={() => {
+            <input type="button" value="Update" id="updateNode-submit" onClick={() => {
                 const id = idRef.current?.value;
                 const value = valueRef.current?.value;
                 if (id) {
