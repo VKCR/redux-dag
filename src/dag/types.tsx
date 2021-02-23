@@ -52,21 +52,3 @@ export interface DagUpdateNodeAction {
 }
 
 export type DagAction = DagAddNodeAction | DagDeleteNodeAction | DagUpdateNodeAction;
-
-/*
-   Visualizer type definitions
-*/
-
-export interface DagNodeViewProps {
-    id: string;
-}
-
-export interface TextInputProps {
-    id: string;
-    label: string;
-}
-
-export interface ResultProps {
-    status: 'OK' | 'ERROR';
-    message: string;
-}

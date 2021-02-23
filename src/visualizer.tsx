@@ -1,41 +1,74 @@
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../reducers';
-import { DagIdToValueMap, DagNodeViewProps, TextInputProps, ResultProps } from './types';
-import { createAddNodeAction, createDeleteNodeAction, createUpdateNodeAction } from './actions';
+import { DagState, DagIdToValueMap } from './dag/types';
+import { createAddNodeAction, createDeleteNodeAction, createUpdateNodeAction } from './dag/actions';
+
+
+/*
+   Props types definitions
+*/
+
+export interface DagNodeViewProps {
+    id: string;
+}
+
+export interface TextInputProps {
+    id: string;
+    label: string;
+}
+
+export interface ResultProps {
+    status: 'OK' | 'ERROR';
+    message: string;
+}
+
+/*
+   Component definitions
+*/
 
 export function DagViewer() {
-    const nodeIds = useSelector((state: RootState) => state.dag.nodeIds);
+    const nodeIds = useSelector((state: DagState) => state.nodeIds);
 
     if (nodeIds.length) {
         return (
-            <ul>
-                {nodeIds.map(id => <li key={id}><DagNodeView id={id} /></li>)}
-            </ul>
+            <div className="dagViewer">
+                <h2>Node list</h2>
+                <ul>
+                    {nodeIds.map(id => <li key={id}><DagNodeView id={id} /></li>)}
+                </ul>
+            </div>
         );
     }
     else {
-        return (<p>Empty graph</p>);
+        return (
+            <div className="dagViewer">
+                <h2>Node list</h2>
+                <p>Empty graph</p>
+            </div>
+        );
     }
 }
 
 function DagNodeView({ id }: DagNodeViewProps) {
-    const node = useSelector((state: RootState) => state.dag.nodeByIds[id]);
-    const value = useSelector((state: RootState) => state.dag.valueByIds[id]);
+    const node = useSelector((state: DagState) => state.nodeByIds[id]);
+    const value = useSelector((state: DagState) => state.valueByIds[id]);
 
     return (
-        <p>
-            Id: {node.id}
-	    | value: {value}
-	    | desc : ({node.desc.join(' ; ')})
-	    | deps : ({node.deps.join(' ; ')})
-        </p>
+        <div>
+            <p>
+                <span>Id: {node.id}</span>
+	| <span>value: {value}</span>
+	| <span>desc : ({node.desc.join(' ; ')})</span>
+	| <span>deps : ({node.deps.join(' ; ')})</span>
+            </p>
+        </div>
     );
 }
 
 export function DagControlPanel() {
     return (
-        <div>
+        <div className="dagControlPanel">
+            <h3>In this demo, the update function of a node is to sum its value, if provided, with the values of all of its dependencies</h3>
             <AddNodeInput />
             <DeleteNodeInput />
             <UpdateNodeInput />
@@ -65,16 +98,16 @@ function AddNodeInput() {
                 const deps = depsRef.current?.value
                     ? depsRef.current?.value.trim().split(' ')
                     : []; // default to empty array
-                const updateFunction = deps.length === 0
-                    ? (valueByIds: DagIdToValueMap) => value
-                    : (valueByIds: DagIdToValueMap) => {
-                        // For this simple example, we sum all the dependency values
-                        let sum = 0;
-                        for (const depId of deps) {
+                const updateFunction = (valueByIds: DagIdToValueMap) => {
+                    // For this simple example, we sum the given value with all the dependency values
+                    let sum: number = value ? Number(value) : 0;
+                    for (const depId in valueByIds) {
+                        if (valueByIds.hasOwnProperty(depId)) {
                             sum += Number(valueByIds[depId]);
                         }
-                        return sum;
-                    };
+                    }
+                    return sum;
+                };
 
                 if (id && value) {
                     try {
@@ -135,9 +168,18 @@ function UpdateNodeInput() {
             <input type="button" value="Update!" id="updateNode-submit" onClick={() => {
                 const id = idRef.current?.value;
                 const value = valueRef.current?.value;
-                if (id && value) {
+                if (id) {
                     try {
-                        dispatch(createUpdateNodeAction(id, (values: DagIdToValueMap) => value));
+                        dispatch(createUpdateNodeAction(id, (valueByIds: DagIdToValueMap) => {
+                            // For this simple example, we sum the given value with all the dependency values
+                            let sum = value ? Number(value) : 0;
+                            for (const depId in valueByIds) {
+                                if (valueByIds.hasOwnProperty(depId)) {
+                                    sum += Number(valueByIds[depId]);
+                                }
+                            }
+                            return sum;
+                        }));
                         setLastResult({ status: 'OK', message: '' });
                     } catch (error) {
                         setLastResult({ status: 'ERROR', message: error.message });
@@ -150,16 +192,16 @@ function UpdateNodeInput() {
 }
 
 const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(({ id, label }, ref) => (
-    <React.Fragment>
+    <div className="textInput">
         <label htmlFor={id}>{label}</label>
         <input type="text" id={id} ref={ref} />
-    </React.Fragment>
+    </div>
 ));
 
 function Result({ status, message }: ResultProps) {
     return (
-        <p style={{ color: status === 'ERROR' ? 'red' : 'white' }}>
-            {status} : {message}
+        <p style={{ color: status === 'ERROR' ? 'red' : 'black' }}>
+            Status - {status} {message}
         </p>
     );
 }
